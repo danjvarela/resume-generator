@@ -6,4 +6,9 @@ import { ViteAliases } from 'vite-aliases'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), eslint(), ViteAliases()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/tests/setup.js',
+  },
 })
