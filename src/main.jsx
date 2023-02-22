@@ -4,6 +4,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from '@pages/Home'
 import Login from '@pages/Login'
+import Signup from '@pages/Signup'
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/signup',
+    element: <Signup />,
   },
 ])
 
