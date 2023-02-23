@@ -26,6 +26,7 @@ export default function SignupRenderer(props) {
     handleSubmit,
     onSubmit,
     errors,
+    isSubmitting,
   } = props
 
   return (
@@ -127,6 +128,7 @@ export default function SignupRenderer(props) {
               <Button
                 type={'submit'}
                 loadingText="Submitting"
+                isLoading={isSubmitting}
                 size="lg"
                 bg={'blue.400'}
                 color={'white'}

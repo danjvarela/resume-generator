@@ -15,7 +15,7 @@ export default function Signup() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
   const navigate = useNavigate()
   const { setSuccess } = useAlertStore()
@@ -58,6 +58,7 @@ export default function Signup() {
     handleSubmit,
     onSubmit,
     errors,
+    isSubmitting,
   }
 
   return <SignupRenderer {...props} />
