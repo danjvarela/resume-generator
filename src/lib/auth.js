@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const _ = axios.create({
-  baseURL: 'http://127.0.0.1:3000',
+  baseURL: import.meta.env.VITE_APP_BACKEND_URL,
 })
 
 const login = async (values) => {
@@ -10,10 +10,19 @@ const login = async (values) => {
       data: { data },
       headers,
     } = await _.post('/v1/auth/sign_in', values)
-    return { data, headers }
+    return { data, headers, success: true }
   } catch (error) {
-    console.log(error)
+    return { errors: error.response.data.errors, success: false }
   }
 }
 
-export { login }
+const signup = async (value) => {
+  try {
+    const { data } = await _.post('/v1/auth', value)
+    return { data, success: true }
+  } catch (error) {
+    return { errors: error.response.data.errors, success: false }
+  }
+}
+
+export { login, signup }

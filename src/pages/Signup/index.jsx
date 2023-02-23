@@ -1,82 +1,64 @@
-import {
-  Flex,
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Stack,
-  Button,
-  Heading,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react'
-import { useState } from 'react'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { signup } from '@lib/auth'
+import { useNavigate } from 'react-router-dom'
+import useAlertStore from '@stores/alertStore'
+import useAutoRedirect from '@hooks/useAutoRedirect'
+import SignupRenderer from './renderer'
 
 export default function Signup() {
-  const [showPassword, setShowPassword] = useState(false)
+  useAutoRedirect()
 
-  return (
-    <Flex
-      minH={'100vh'}
-      align={'center'}
-      justify={'center'}
-      bg={useColorModeValue('gray.50', 'gray.800')}
-    >
-      <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
-        <Stack align={'center'}>
-          <Heading fontSize={'4xl'} textAlign={'center'}>
-            Signup
-          </Heading>
-          <Text fontSize={'lg'} color={'gray.600'}>
-            Let&#39;s get you started!
-          </Text>
-        </Stack>
-        <Box
-          rounded={'lg'}
-          bg={useColorModeValue('white', 'gray.700')}
-          boxShadow={'lg'}
-          p={8}
-        >
-          <Stack spacing={4}>
-            <FormControl id="email" isRequired>
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" />
-            </FormControl>
-            <FormControl id="password" isRequired>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <Input type={showPassword ? 'text' : 'password'} />
-                <InputRightElement h={'full'}>
-                  <Button
-                    variant={'ghost'}
-                    onClick={() =>
-                      setShowPassword((showPassword) => !showPassword)
-                    }
-                  >
-                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </FormControl>
-            <Stack spacing={10} pt={2}>
-              <Button
-                loadingText="Submitting"
-                size="lg"
-                bg={'blue.400'}
-                color={'white'}
-                _hover={{
-                  bg: 'blue.500',
-                }}
-              >
-                Signup
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Stack>
-    </Flex>
-  )
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm()
+  const navigate = useNavigate()
+  const { setSuccess } = useAlertStore()
+
+  useEffect(() => {
+    console.log(errors)
+  }, [errors])
+
+  const onSubmit = async (data) => {
+    const signupData = await signup({
+      ...data,
+      confirm_success_url: `${import.meta.env.VITE_APP_BASE_URL}/login`,
+    })
+
+    if (signupData.success) {
+      setSuccess(
+        'Account created successfully. Please check your email for confirmation instructions.'
+      )
+      navigate('/login')
+    } else {
+      Object.keys(signupData.errors).forEach((key) => {
+        if (key === 'full_messages') {
+          return
+        }
+        setError(
+          key,
+          { type: 'custom', message: signupData.errors[key][0] },
+          { shouldFocus: true }
+        )
+      })
+    }
+  }
+
+  const props = {
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    register,
+    handleSubmit,
+    onSubmit,
+    errors,
+  }
+
+  return <SignupRenderer {...props} />
 }
