@@ -40,11 +40,10 @@ export default function MobileNav({ onOpen, ...rest }) {
 
       <Text
         display={{ base: 'flex', md: 'none' }}
-        fontSize="2xl"
-        fontFamily="monospace"
+        fontSize="lg"
         fontWeight="bold"
       >
-        Logo
+        Resume Generator
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
