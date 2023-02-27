@@ -8,12 +8,11 @@ const useAutoRedirect = () => {
   const currentLocation = useLocation()
 
   const autoRedirect = () => {
-    const requireLogIn = (path) => {
-      return ['/home'].includes(path)
-    }
+    const authRequiredPaths = ['/resumes', '/drafts', '/profile']
+    const requireLogIn = (path) => authRequiredPaths.includes(path)
 
     if (isLoggedIn() && !requireLogIn(currentLocation.pathname)) {
-      navigate('/home')
+      navigate('/resumes')
     }
 
     if (!isLoggedIn() && requireLogIn(currentLocation.pathname)) {
