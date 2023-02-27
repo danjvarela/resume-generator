@@ -12,7 +12,7 @@ const cookieStorage = {
 const useAuthStore = create(
   persist(
     (_, get) => ({
-      headers: cookies.get('auth-storage')?.state?.headers,
+      headers: cookies.get('auth-storage')?.state?.headers || {},
       isLoggedIn: () => !!get().headers?.['access-token'],
     }),
     {
