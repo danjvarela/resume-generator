@@ -1,5 +1,3 @@
-import MainLayout from '@layouts/MainLayout'
-
 export default function Home() {
-  return <MainLayout>All user drafts appear here</MainLayout>
+  return 'Drafts are shown here'
 }

@@ -25,4 +25,13 @@ const signup = async (value) => {
   }
 }
 
-export { login, signup }
+const validateToken = async (headers) => {
+  try {
+    const { data } = await _.get('/v1/auth/validate_token', { headers })
+    return { data, success: true }
+  } catch (error) {
+    return { errors: error.response.data.errors, success: false }
+  }
+}
+
+export { login, signup, validateToken }

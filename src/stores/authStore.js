@@ -1,5 +1,9 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import {
+  persist,
+  createJSONStorage,
+  subscribeWithSelector,
+} from 'zustand/middleware'
 import Cookies from 'universal-cookie'
 
 const cookies = new Cookies()
@@ -10,15 +14,24 @@ const cookieStorage = {
 }
 
 const useAuthStore = create(
-  persist(
-    (_, get) => ({
-      headers: cookies.get('auth-storage')?.state?.headers || {},
-      isLoggedIn: () => !!get().headers?.['access-token'],
-    }),
-    {
-      name: 'auth-storage',
-      storage: createJSONStorage(() => cookieStorage),
-    }
+  subscribeWithSelector(
+    persist(
+      () => ({
+        headers: cookies.get('auth-storage')?.state?.headers || {},
+        loggedUser: {},
+        isAuthenticated: !!cookies.get('auth-storage')?.state?.isAuthenticated,
+      }),
+      {
+        name: 'auth-storage',
+        storage: createJSONStorage(() => cookieStorage),
+        // only save these values in cookies
+        partialize: (state) => ({
+          headers: state.headers,
+          loggedUser: state.loggedUser,
+          isAuthenticated: state.isAuthenticated,
+        }),
+      }
+    )
   )
 )
 

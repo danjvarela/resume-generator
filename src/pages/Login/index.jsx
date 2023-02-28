@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import useAuthStore from '@stores/authStore'
 import { login } from '@lib/auth'
-import useAutoRedirect from '@hooks/useAutoRedirect'
 import useAlertStore from '@stores/alertStore'
+import { useNavigate } from 'react-router-dom'
 import LoginRenderer from './renderer'
 
 export default function Login() {
-  useAutoRedirect()
-
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -51,7 +50,9 @@ export default function Login() {
           'token-type': headers['token-type'],
           uid: headers.uid,
         },
+        isAuthenticated: true,
       })
+      navigate('/resumes')
     } else {
       setFocus('email')
       setError(loginResponse.errors[0])
