@@ -1,10 +1,7 @@
 import { Box, Heading, Container, Text, Button, Stack } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
-import useAutoRedirect from '@hooks/useAutoRedirect'
 
 export default function Landing() {
-  useAutoRedirect()
-
   const navigate = useNavigate()
   const navigateToLogin = () => navigate('/login')
   const navigateToSignup = () => navigate('/signup')
