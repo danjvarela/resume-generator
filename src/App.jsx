@@ -8,8 +8,16 @@ import Signup from '@pages/Signup'
 import Drafts from '@pages/Drafts'
 import Profile from '@pages/Profile'
 import MainLayout from '@layouts/MainLayout'
+import LoadingScreen from '@components/LoadingScreen'
+import { useAuthStoreWithCookies } from '@stores/authStore'
 
 export default function App() {
+  const authFromCookiesLoaded = useAuthStoreWithCookies()
+
+  if (!authFromCookiesLoaded) {
+    return <LoadingScreen />
+  }
+
   return (
     <Routes>
       {/* These routes require authentication */}
