@@ -41,7 +41,7 @@ export default function Login() {
     const loginResponse = await login(data)
 
     if (loginResponse.success) {
-      const { headers } = loginResponse
+      const { headers, data: loggedUser } = loginResponse
       useAuthStore.setState({
         headers: {
           'access-token': headers['access-token'],
@@ -50,6 +50,7 @@ export default function Login() {
           'token-type': headers['token-type'],
           uid: headers.uid,
         },
+        loggedUser,
         isAuthenticated: true,
       })
       navigate('/resumes')
