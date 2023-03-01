@@ -7,6 +7,7 @@ export default function Landing() {
 
   const navigate = useNavigate()
   const navigateToLogin = () => navigate('/login')
+  const navigateToSignup = () => navigate('/signup')
 
   return (
     <>
@@ -47,6 +48,7 @@ export default function Landing() {
               _hover={{
                 bg: 'green.500',
               }}
+              onClick={navigateToSignup}
             >
               Get Started
             </Button>
