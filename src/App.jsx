@@ -12,11 +12,30 @@ import LoadingScreen from '@components/LoadingScreen'
 import { useEffect } from 'react'
 import useAuthStore from '@stores/authStore'
 import { validateToken } from '@lib/auth'
+import { shallow } from 'zustand/shallow'
+import useAlertStore from '@stores/alertStore'
 
 export default function App() {
-  const headers = useAuthStore((state) => state.headers)
-  const loggedUser = useAuthStore((state) => state.loggedUser)
-  const headersValidated = useAuthStore((state) => state._headersValidated)
+  const [
+    headers,
+    loggedUser,
+    headersValidated,
+    setLoggedUser,
+    setHeadersValidated,
+    clearAuth,
+  ] = useAuthStore(
+    (state) => [
+      state.headers,
+      state.loggedUser,
+      state._headersValidated,
+      state.setLoggedUser,
+      state.setHeadersValidated,
+      state.clearAuth,
+    ],
+    shallow
+  )
+
+  const setWarning = useAlertStore((state) => state.setWarning)
 
   // validate headers once auth's value has been updated from cookies
   useEffect(() => {
@@ -28,12 +47,14 @@ export default function App() {
             const headers = useAuthStore.getState().headers
             const { data, success } = await validateToken(headers)
             if (success) {
-              useAuthStore.setState({
-                loggedUser: data.data,
-                _headersValidated: true,
-              })
+              setLoggedUser(data.data)
+              setHeadersValidated(true)
             } else {
-              useAuthStore.setState({ _headersValidated: true })
+              setHeadersValidated(true)
+              clearAuth()
+              setWarning(
+                'Session has expired. Please log in again to continue.'
+              )
             }
           }
         }

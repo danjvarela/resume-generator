@@ -64,6 +64,9 @@ const initialState = (set) => ({
       _hasHydrated: state,
     })
   },
+  setHeaders: (headers) => set({ headers }),
+  setLoggedUser: (loggedUser) => set({ loggedUser }),
+  setHeadersValidated: (state) => set({ _headersValidated: state }),
 })
 
 const useAuthStore = create(

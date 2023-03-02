@@ -10,6 +10,13 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const [setHeaders, setHeadersValidated, setLoggedUser] = useAuthStore(
+    (state) => [
+      state.setHeaders,
+      state.setHeadersValidated,
+      state.setLoggedUser,
+    ]
+  )
 
   const {
     register,
@@ -51,17 +58,15 @@ export default function Login() {
     const { success, headers, data: loggedUser, errors } = await login(data)
 
     if (success) {
-      useAuthStore.setState({
-        headers: {
-          'access-token': headers['access-token'],
-          client: headers.client,
-          expiry: headers.expiry,
-          'token-type': headers['token-type'],
-          uid: headers.uid,
-        },
-        loggedUser,
-        _headersValidated: true,
+      setHeaders({
+        'access-token': headers['access-token'],
+        client: headers.client,
+        expiry: headers.expiry,
+        'token-type': headers['token-type'],
+        uid: headers.uid,
       })
+      setLoggedUser(loggedUser)
+      setHeadersValidated(true)
       navigate('/resumes')
     } else {
       setFocus('email')

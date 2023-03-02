@@ -1,10 +1,6 @@
-import axios from 'axios'
+import _ from './axios'
 
-const _ = axios.create({
-  baseURL: import.meta.env.VITE_APP_BACKEND_URL,
-})
-
-const login = async (values) => {
+export const login = async (values) => {
   try {
     const {
       data: { data },
@@ -16,7 +12,7 @@ const login = async (values) => {
   }
 }
 
-const signup = async (value) => {
+export const signup = async (value) => {
   try {
     const { data } = await _.post('/v1/auth', value)
     return { data, success: true }
@@ -25,7 +21,7 @@ const signup = async (value) => {
   }
 }
 
-const validateToken = async (headers) => {
+export const validateToken = async (headers) => {
   try {
     const { data } = await _.get('/v1/auth/validate_token', { headers })
     return { data, success: true }
@@ -34,7 +30,7 @@ const validateToken = async (headers) => {
   }
 }
 
-const signOut = async (headers) => {
+export const signOut = async (headers) => {
   try {
     const { success } = await _.delete('/v1/auth/sign_out', { headers })
     return { success }
@@ -42,5 +38,3 @@ const signOut = async (headers) => {
     return { errors: error.response.data.errors, success: false }
   }
 }
-
-export { login, signup, validateToken, signOut }
