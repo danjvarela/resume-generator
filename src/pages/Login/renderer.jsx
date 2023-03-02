@@ -27,6 +27,7 @@ export default function LoginRenderer(props) {
     alertMessage,
     alertStatus,
     onSubmit,
+    navigate,
   } = props
 
   return (
@@ -104,7 +105,7 @@ export default function LoginRenderer(props) {
             <Stack>
               <Text align={'center'}>
                 Don&#39;t have an account?{' '}
-                <Link color={'blue.400'} href={'/signup'}>
+                <Link color={'blue.400'} onClick={() => navigate('/signup')}>
                   Create one!
                 </Link>
               </Text>

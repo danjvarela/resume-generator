@@ -14,9 +14,16 @@ import {
 } from '@chakra-ui/react'
 import { FiMenu, FiChevronDown } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import useAuthStore from '@stores/authStore'
 
 export default function MobileNav({ onOpen, ...rest }) {
   const navigate = useNavigate()
+  const clearAuth = useAuthStore((state) => state.clearAuth)
+
+  const handleSignOut = () => {
+    clearAuth()
+    navigate('/login')
+  }
 
   return (
     <Flex
@@ -77,7 +84,7 @@ export default function MobileNav({ onOpen, ...rest }) {
             <MenuList bg={'white'} borderColor={'gray.200'}>
               <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>

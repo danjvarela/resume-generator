@@ -1,73 +1,73 @@
 import { create } from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
-import { useEffect, useState } from 'react'
-import { useCookies } from 'react-cookie'
-import isEmpty from 'lodash/isEmpty'
+import {
+  subscribeWithSelector,
+  persist,
+  createJSONStorage,
+} from 'zustand/middleware'
 import { signJWT, verifyJWT } from '@lib/jwt'
-import { validateToken } from '@lib/auth'
+import Cookies from 'universal-cookie'
+import isEmpty from 'lodash/isEmpty'
 
-const initialState = () => ({
+const cookies = new Cookies()
+
+const cookieStorage = {
+  getItem: async (name) => {
+    const jwt = cookies.get(name)
+    if (isEmpty(jwt)) {
+      return '{}'
+    }
+    const { payload } = await verifyJWT(jwt)
+    console.log(`${name} has been retrieved. decrypted value is: `, payload)
+    return JSON.stringify(payload)
+  },
+  setItem: async (name, value) => {
+    const jwt = await signJWT(JSON.parse(value))
+    cookies.set(name, jwt)
+    console.log(
+      `${name} has been set to encrypted value of: `,
+      JSON.parse(value)
+    )
+  },
+  removeItem: async (name) => {
+    cookies.remove(name)
+  },
+}
+
+const persistMiddlewareOpts = {
+  name: '_resume-generator-auth',
+  partialize: (state) => {
+    const { headers, loggedUser } = state
+    return { headers, loggedUser }
+  },
+  storage: createJSONStorage(() => cookieStorage),
+  onRehydrateStorage: () => {
+    console.log(`hydration started`)
+
+    return (state, error) => {
+      if (error) {
+        console.log('an error occurred during hydration: ', error)
+      } else {
+        state.setHasHydrated(true)
+        console.log('hydration finished')
+      }
+    }
+  },
+}
+const initialState = (set) => ({
   headers: {},
   loggedUser: {},
-  isAuthenticated: false,
+  _headersValidated: false,
+  _hasHydrated: false,
+  clearAuth: () => set({ headers: {}, loggedUser: {} }),
+  setHasHydrated: (state) => {
+    set({
+      _hasHydrated: state,
+    })
+  },
 })
 
-const useAuthStore = create(subscribeWithSelector(initialState))
+const useAuthStore = create(
+  subscribeWithSelector(persist(initialState, persistMiddlewareOpts))
+)
 
 export default useAuthStore
-
-export const useAuthStoreWithCookies = () => {
-  const [cookies, setCookie] = useCookies(['auth-storage'])
-  const [authFromCookiesLoaded, setAuthFromCookiesLoaded] = useState(false)
-
-  // subscribe for any changes in authStore
-  // save its encrypted value to cookies everytime its value changes
-  useEffect(
-    () =>
-      useAuthStore.subscribe(
-        (state) => {
-          const { headers, loggedUser, isAuthenticated } = state
-          return { headers, loggedUser, isAuthenticated }
-        },
-        (auth) => {
-          const setAuth = async () => {
-            setCookie('auth-storage', await signJWT(auth))
-          }
-          setAuth()
-        },
-        { fireImmediately: true }
-      ),
-    []
-  )
-
-  // get auth data from cookies and validate the token.
-  // set logged status if token is valid
-  useEffect(() => {
-    const parseAndDecryptAuth = async () => {
-      // there is no saved auth cookie so there is no token to validate
-      if (isEmpty(cookies['auth-storage'])) {
-        setAuthFromCookiesLoaded(true)
-        return
-      }
-
-      // decrypt cookie and get the header
-      const {
-        payload: { headers },
-      } = (await verifyJWT(cookies['auth-storage'])) || {}
-
-      // validate the headers
-      const { data: loggedUser, success } = await validateToken(headers)
-
-      // token is valid
-      if (success) {
-        useAuthStore.setState({ headers, loggedUser, isAuthenticated: true })
-      }
-
-      setAuthFromCookiesLoaded(true)
-    }
-
-    parseAndDecryptAuth()
-  }, [])
-
-  return authFromCookiesLoaded
-}

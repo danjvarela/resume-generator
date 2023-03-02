@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import useAuthStore from '@stores/authStore'
 import { login } from '@lib/auth'
 import useAlertStore from '@stores/alertStore'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import LoginRenderer from './renderer'
+import useAuthStore from '@stores/authStore'
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const {
     register,
@@ -22,9 +23,18 @@ export default function Login() {
   const {
     message: alertMessage,
     setError,
+    setSuccess,
     status: alertStatus,
     removeAlert,
   } = useAlertStore()
+
+  useEffect(() => {
+    if (searchParams.get('account_confirmation_success')) {
+      setSuccess(
+        'Your account has been confirmed. Login to start creating your resume!'
+      )
+    }
+  }, [searchParams])
 
   // remove alert if user types on inputs
   useEffect(() => {
@@ -38,10 +48,9 @@ export default function Login() {
 
   // logs in user
   const onSubmit = async (data) => {
-    const loginResponse = await login(data)
+    const { success, headers, data: loggedUser, errors } = await login(data)
 
-    if (loginResponse.success) {
-      const { headers, data: loggedUser } = loginResponse
+    if (success) {
       useAuthStore.setState({
         headers: {
           'access-token': headers['access-token'],
@@ -51,12 +60,12 @@ export default function Login() {
           uid: headers.uid,
         },
         loggedUser,
-        isAuthenticated: true,
+        _headersValidated: true,
       })
       navigate('/resumes')
     } else {
       setFocus('email')
-      setError(loginResponse.errors[0])
+      setError(errors[0])
       reset({ password: '', email: '' })
     }
   }
@@ -70,6 +79,7 @@ export default function Login() {
     alertMessage,
     alertStatus,
     onSubmit,
+    navigate,
   }
 
   return <LoginRenderer {...props} />

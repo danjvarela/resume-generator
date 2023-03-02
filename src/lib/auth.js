@@ -34,4 +34,13 @@ const validateToken = async (headers) => {
   }
 }
 
-export { login, signup, validateToken }
+const signOut = async (headers) => {
+  try {
+    const { success } = await _.delete('/v1/auth/sign_out', { headers })
+    return { success }
+  } catch (error) {
+    return { errors: error.response.data.errors, success: false }
+  }
+}
+
+export { login, signup, validateToken, signOut }

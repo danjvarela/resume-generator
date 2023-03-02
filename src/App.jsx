@@ -9,12 +9,41 @@ import Drafts from '@pages/Drafts'
 import Profile from '@pages/Profile'
 import MainLayout from '@layouts/MainLayout'
 import LoadingScreen from '@components/LoadingScreen'
-import { useAuthStoreWithCookies } from '@stores/authStore'
+import { useEffect } from 'react'
+import useAuthStore from '@stores/authStore'
+import { validateToken } from '@lib/auth'
 
 export default function App() {
-  const authFromCookiesLoaded = useAuthStoreWithCookies()
+  const headers = useAuthStore((state) => state.headers)
+  const loggedUser = useAuthStore((state) => state.loggedUser)
+  const headersValidated = useAuthStore((state) => state._headersValidated)
 
-  if (!authFromCookiesLoaded) {
+  // validate headers once auth's value has been updated from cookies
+  useEffect(() => {
+    const unsubHasHydrated = useAuthStore.subscribe(
+      (state) => state._hasHydrated,
+      (hasHydrated) => {
+        const validate = async () => {
+          if (hasHydrated) {
+            const headers = useAuthStore.getState().headers
+            const { data, success } = await validateToken(headers)
+            if (success) {
+              useAuthStore.setState({
+                loggedUser: data.data,
+                _headersValidated: true,
+              })
+            } else {
+              useAuthStore.setState({ _headersValidated: true })
+            }
+          }
+        }
+        validate()
+      }
+    )
+    return unsubHasHydrated
+  }, [])
+
+  if (!headersValidated) {
     return <LoadingScreen />
   }
 
@@ -24,7 +53,7 @@ export default function App() {
       <Route
         element={
           <MainLayout>
-            <PrivateRoute />
+            <PrivateRoute loggedUser={loggedUser} headers={headers} />
           </MainLayout>
         }
       >
@@ -35,7 +64,9 @@ export default function App() {
 
       {/* These routes does not require authentication to be accessed but will reroute to /resumes if  */}
       {/* there is authentication data in cookies */}
-      <Route element={<PublicRoute />}>
+      <Route
+        element={<PublicRoute loggedUser={loggedUser} headers={headers} />}
+      >
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
