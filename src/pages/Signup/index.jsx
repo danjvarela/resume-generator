@@ -4,6 +4,7 @@ import { signup } from '@lib/auth'
 import { useNavigate } from 'react-router-dom'
 import useAlertStore from '@stores/alertStore'
 import SignupRenderer from './renderer'
+import omit from 'lodash-es/omit'
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false)
@@ -18,24 +19,21 @@ export default function Signup() {
   const { setSuccess } = useAlertStore()
 
   const onSubmit = async (data) => {
-    const signupData = await signup({
+    const { success, errors } = await signup({
       ...data,
       confirm_success_url: `${import.meta.env.VITE_APP_BASE_URL}/login`,
     })
 
-    if (signupData.success) {
+    if (success) {
       setSuccess(
         'Account created successfully. Please check your email for confirmation instructions.'
       )
       navigate('/login')
     } else {
-      Object.keys(signupData.errors).forEach((key) => {
-        if (key === 'full_messages') {
-          return
-        }
+      Object.keys(omit(errors, ['full_messages'])).forEach((key) => {
         setError(
           key,
-          { type: 'custom', message: signupData.errors[key][0] },
+          { type: 'custom', message: errors[key][0] },
           { shouldFocus: true }
         )
       })
@@ -52,6 +50,7 @@ export default function Signup() {
     onSubmit,
     errors,
     isSubmitting,
+    navigate,
   }
 
   return <SignupRenderer {...props} />

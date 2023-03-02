@@ -14,6 +14,7 @@ import useAuthStore from '@stores/authStore'
 import { validateToken } from '@lib/auth'
 
 export default function App() {
+  const headers = useAuthStore((state) => state.headers)
   const loggedUser = useAuthStore((state) => state.loggedUser)
   const headersValidated = useAuthStore((state) => state._headersValidated)
 
@@ -52,7 +53,7 @@ export default function App() {
       <Route
         element={
           <MainLayout>
-            <PrivateRoute loggedUser={loggedUser} />
+            <PrivateRoute loggedUser={loggedUser} headers={headers} />
           </MainLayout>
         }
       >
@@ -63,7 +64,9 @@ export default function App() {
 
       {/* These routes does not require authentication to be accessed but will reroute to /resumes if  */}
       {/* there is authentication data in cookies */}
-      <Route element={<PublicRoute loggedUser={loggedUser} />}>
+      <Route
+        element={<PublicRoute loggedUser={loggedUser} headers={headers} />}
+      >
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

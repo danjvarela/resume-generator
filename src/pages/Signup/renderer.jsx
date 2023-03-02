@@ -27,6 +27,7 @@ export default function SignupRenderer(props) {
     onSubmit,
     errors,
     isSubmitting,
+    navigate,
   } = props
 
   return (
@@ -142,7 +143,7 @@ export default function SignupRenderer(props) {
             <Stack>
               <Text align={'center'}>
                 Already a user?{' '}
-                <Link color={'blue.400'} href={'/login'}>
+                <Link color={'blue.400'} onClick={() => navigate('/login')}>
                   Log in!
                 </Link>
               </Text>
