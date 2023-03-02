@@ -58,6 +58,7 @@ const initialState = (set) => ({
   loggedUser: {},
   _headersValidated: false,
   _hasHydrated: false,
+  clearAuth: () => set({ headers: {}, loggedUser: {} }),
   setHasHydrated: (state) => {
     set({
       _hasHydrated: state,
