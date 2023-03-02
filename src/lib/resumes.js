@@ -11,3 +11,15 @@ export const getAllResumes = async (headers) => {
     return { errors: data.errors, status, success: false }
   }
 }
+
+export const createResume = async (values, headers) => {
+  try {
+    const {
+      data: { data },
+    } = await _.post('/v1/resumes', { resume: values }, { headers })
+    return { data, success: true }
+  } catch (error) {
+    const { data, status } = error.response
+    return { errors: data.errors, status, success: false }
+  }
+}

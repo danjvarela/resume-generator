@@ -6,17 +6,18 @@ import useResumeStore from '@stores/resumeStore'
 import useAuthStore from '@stores/authStore'
 import useAlertStore from '@stores/alertStore'
 import { useNavigate } from 'react-router-dom'
+import { shallow } from 'zustand/shallow'
 
 export default function Home() {
-  const [headers, clearAuth] = useAuthStore((state) => [
-    state.headers,
-    state.clearAuth,
-  ])
+  const [headers, clearAuth] = useAuthStore(
+    (state) => [state.headers, state.clearAuth],
+    shallow
+  )
   const setWarning = useAlertStore((state) => state.setWarning)
-  const [resumes, setResumes] = useResumeStore((state) => [
-    state.resumes,
-    state.setResumes,
-  ])
+  const [resumes, setResumes] = useResumeStore(
+    (state) => [state.resumes, state.setResumes],
+    shallow
+  )
   const navigate = useNavigate()
 
   // get all resumes on mount

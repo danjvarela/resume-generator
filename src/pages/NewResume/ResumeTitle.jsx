@@ -11,9 +11,9 @@ import {
 } from '@chakra-ui/react'
 import { FiEdit, FiCheck, FiX } from 'react-icons/fi'
 
-export default function ResumeTitle({ title }) {
+export default function ResumeTitle({ title, setTitle }) {
   return (
-    <Editable defaultValue={title}>
+    <Editable defaultValue={title} onChange={setTitle}>
       <HStack>
         <Heading as={EditablePreview} size="lg" noOfLines={1} />
         <Input as={EditableInput} />

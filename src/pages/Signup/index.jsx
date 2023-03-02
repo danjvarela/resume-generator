@@ -16,7 +16,7 @@ export default function Signup() {
     formState: { errors, isSubmitting },
   } = useForm()
   const navigate = useNavigate()
-  const { setSuccess } = useAlertStore()
+  const setSuccess = useAlertStore((state) => state.setSuccess)
 
   const onSubmit = async (data) => {
     const { success, errors } = await signup({

@@ -5,6 +5,7 @@ import useAlertStore from '@stores/alertStore'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import LoginRenderer from './renderer'
 import useAuthStore from '@stores/authStore'
+import { shallow } from 'zustand/shallow'
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
@@ -15,7 +16,8 @@ export default function Login() {
       state.setHeaders,
       state.setHeadersValidated,
       state.setLoggedUser,
-    ]
+    ],
+    shallow
   )
 
   const {
@@ -27,13 +29,17 @@ export default function Login() {
     watch,
   } = useForm()
 
-  const {
-    message: alertMessage,
-    setError,
-    setSuccess,
-    status: alertStatus,
-    removeAlert,
-  } = useAlertStore()
+  const [alertMessage, setError, setSuccess, alertStatus, removeAlert] =
+    useAlertStore(
+      (state) => [
+        state.message,
+        state.setError,
+        state.setSuccess,
+        state.status,
+        state.removeAlert,
+      ],
+      shallow
+    )
 
   useEffect(() => {
     if (searchParams.get('account_confirmation_success')) {
