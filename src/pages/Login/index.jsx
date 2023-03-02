@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import useAuthStore from '@stores/authStore'
 import { login } from '@lib/auth'
 import useAlertStore from '@stores/alertStore'
 import { useNavigate } from 'react-router-dom'
 import LoginRenderer from './renderer'
+import useAuthStore from '@stores/authStore'
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
@@ -51,7 +51,7 @@ export default function Login() {
           uid: headers.uid,
         },
         loggedUser,
-        isAuthenticated: true,
+        _headersValidated: true,
       })
       navigate('/resumes')
     } else {
