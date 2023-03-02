@@ -12,7 +12,6 @@ import {
 } from '@chakra-ui/react'
 import { FiTrash, FiEdit, FiDownload } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
-// import TextWithRef from '@components/TextWithRef'
 import format from 'date-fns/format'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 

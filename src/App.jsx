@@ -7,6 +7,7 @@ import Resumes from '@pages/Resumes'
 import Signup from '@pages/Signup'
 import Drafts from '@pages/Drafts'
 import Profile from '@pages/Profile'
+import NewResume from '@pages/NewResume'
 import MainLayout from '@layouts/MainLayout'
 import LoadingScreen from '@components/LoadingScreen'
 import { useEffect } from 'react'
@@ -79,6 +80,7 @@ export default function App() {
         }
       >
         <Route path="/resumes" element={<Resumes />} />
+        <Route path="/resumes/new" element={<NewResume />} />
         <Route path="/drafts" element={<Drafts />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
