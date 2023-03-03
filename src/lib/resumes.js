@@ -23,3 +23,15 @@ export const createResume = async (values, headers) => {
     return { errors: data.errors, status, success: false }
   }
 }
+
+export const deleteResume = async (id, headers) => {
+  try {
+    const {
+      data: { data },
+    } = await _.delete(`/v1/resumes/${id}`, { headers })
+    return { data, success: true }
+  } catch (error) {
+    const { data, status } = error.response
+    return { errors: data.errors, status, success: false }
+  }
+}

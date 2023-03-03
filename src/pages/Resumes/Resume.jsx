@@ -14,13 +14,32 @@ import { FiTrash, FiEdit, FiDownload } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
 import format from 'date-fns/format'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import { deleteResume } from '@lib/resumes'
+import useAuthStore from '@stores/authStore'
+import useAlertStore from '@stores/alertStore'
+import { shallow } from 'zustand/shallow'
 
-export default function Resume({ resume: { title, created_at: createdAt } }) {
+export default function Resume({ resume }) {
+  const { title, created_at: createdAt, id } = resume
+  const [headers, clearAuth] = useAuthStore(
+    (state) => [state.headers, state.clearAuth],
+    shallow
+  )
+  const setWarning = useAlertStore((state) => state.setWarning)
   const timeAgoInWords = formatDistanceToNow(new Date(Date(createdAt)))
   const formattedCreatedAt = format(
     new Date(Date(createdAt)),
     'MMMM d, yyyy h:mm b'
   )
+
+  const handleDeleteResume = async () => {
+    console.log('sending this headers for deleting a resume', headers)
+    const { status } = await deleteResume(id, headers)
+    if (status === 401) {
+      clearAuth()
+      setWarning('Session has expired. Please log in again to continue.')
+    }
+  }
 
   return (
     <Card as={LinkBox} mt={5}>
@@ -64,6 +83,7 @@ export default function Resume({ resume: { title, created_at: createdAt } }) {
               colorScheme="red"
               aria-label="Delete Resume"
               size="md"
+              onClick={handleDeleteResume}
               icon={<FiTrash />}
             />
           </HStack>

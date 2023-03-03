@@ -5,8 +5,10 @@ import { getAllResumes } from '@lib/resumes'
 import useResumeStore from '@stores/resumeStore'
 import useAuthStore from '@stores/authStore'
 import useAlertStore from '@stores/alertStore'
+import useWebsocketStore from '@stores/websocketStore'
 import { useNavigate } from 'react-router-dom'
 import { shallow } from 'zustand/shallow'
+import isEmpty from 'lodash-es/isEmpty'
 
 export default function Home() {
   const [headers, clearAuth] = useAuthStore(
@@ -19,6 +21,16 @@ export default function Home() {
     shallow
   )
   const navigate = useNavigate()
+  const [action, lastJsonMessage] = useWebsocketStore((state) => [
+    state.action,
+    state.lastJsonMessage,
+  ])
+
+  useEffect(() => {
+    if (action === 'destroy' && !isEmpty(lastJsonMessage)) {
+      setResumes(resumes.filter((resume) => resume.id !== lastJsonMessage.id))
+    }
+  }, [lastJsonMessage, action])
 
   // get all resumes on mount
   useEffect(() => {

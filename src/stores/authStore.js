@@ -6,7 +6,8 @@ import {
 } from 'zustand/middleware'
 import { signJWT, verifyJWT } from '@lib/jwt'
 import Cookies from 'universal-cookie'
-import isEmpty from 'lodash/isEmpty'
+import isEmpty from 'lodash-es/isEmpty'
+import merge from 'lodash-es/merge'
 
 const cookies = new Cookies()
 
@@ -40,19 +41,21 @@ const persistMiddlewareOpts = {
     return { headers, loggedUser }
   },
   storage: createJSONStorage(() => cookieStorage),
+  merge: (persistedState, currentState) => merge(currentState, persistedState),
   onRehydrateStorage: () => {
-    console.log(`hydration started`)
+    console.log('hydration started')
 
     return (state, error) => {
       if (error) {
-        console.log('an error occurred during hydration: ', error)
+        console.log('an error occurred during hydration', error)
       } else {
         state.setHasHydrated(true)
-        console.log('hydration finished')
+        console.log('hydration finished', state)
       }
     }
   },
 }
+
 const initialState = (set) => ({
   headers: {},
   loggedUser: {},
